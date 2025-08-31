@@ -1,0 +1,247 @@
+@model User
+@{
+    ViewData["Title"] = "User Statistics";
+    var totalUserDepositAmount = Model.Transactions.Where(x => x.Type == TransactionType.Deposit).Select(x => x.Amount).Sum();
+    var totalUserWithdrawalsAmount = Model.Transactions.Where(x => x.Type == TransactionType.Withdrawal).Select(x => x.Amount).Sum();
+    var totalUserBetAmount = Model.BetResults.Select(x => x.BetAmount).Sum();
+    var totalUserWinningAmount = Model.BetResults.Where(bet => bet.Won).Select(x => x.BetAmount).Sum();
+    var totalUserBets = Model.BetResults.Count;
+    var totalWonBets = Model.BetResults.Where(bet => bet.Won).Count();
+    var totalLostBets = Model.BetResults.Where(bet => !bet.Won).Count();
+    var userWinRate = totalUserBets > 0 ? (double)totalWonBets / totalUserBets * 100 : 0;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4"><i class="bi bi-person-circle"></i> User Statistics</h2>
+
+            <!-- User Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-info-circle"></i> Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Username:</strong> @Model.Username</p>
+                            <p><strong>Email:</strong> @Model.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Balance:</strong> <span class="text-success fw-bold">$@Model.Balance.ToString("F2")</span></p>
+                            <p><strong>Member Since:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">Total Deposits</h5>
+                            <h3 class="text-success">$@totalUserDepositAmount.ToString("F2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">Total Withdrawals</h5>
+                            <h3 class="text-danger">$@totalUserWithdrawalsAmount.ToString("F2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">Total Bet Amount</h5>
+                            <h3 class="text-primary">$@totalUserBetAmount.ToString("F2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">Total Winnings</h5>
+                            <h3 class="text-warning">$@totalUserWinningAmount.ToString("F2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Betting Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-dice-5"></i> Betting Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p><strong>Total Bets:</strong> @totalUserBets</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Won Bets:</strong> <span class="text-success">@totalWonBets</span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Lost Bets:</strong> <span class="text-danger">@totalLostBets</span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Win Rate:</strong> <span class="fw-bold">@userWinRate.ToString("F1")%</span></p>
+                        </div>
+                    </div>
+                    @if (totalUserBets > 0)
+                    {
+                        <div class="progress mt-2">
+                            <div class="progress-bar bg-success"
+                                 role="progressbar"
+                                 style="width: @userWinRate.ToString("F1")%"
+                                 aria-valuenow="@userWinRate"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                @userWinRate.ToString("F1")% Win Rate
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Transactions History -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="bi bi-clock-history"></i> Recent Transactions</h5>
+                    <span class="badge bg-secondary">@Model.Transactions.Count total</span>
+                </div>
+                <div class="card-body">
+                    @if (Model.Transactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.Transactions.Take(10))
+                                    {
+                                        <tr>
+                                            <td>@transaction.TransactionDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                            <td>
+                                                @if (transaction.Type == TransactionType.Deposit)
+                                                {
+                                                    <span class="badge bg-success">Deposit</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Withdrawal</span>
+                                                }
+                                            </td>
+                                            <td class="@(transaction.Type == TransactionType.Deposit ? "text-success" : "text-danger")">
+                                                @(transaction.Type == TransactionType.Deposit ? "+" : "-")$@transaction.Amount.ToString("F2")
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (Model.Transactions.Count > 10)
+                        {
+                            <p class="text-muted mt-2">Showing last 10 transactions. Total: @Model.Transactions.Count</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No transactions found.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Betting History -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="bi bi-dice-5"></i> Recent Bets</h5>
+                    <span class="badge bg-secondary">@Model.BetResults.Count total</span>
+                </div>
+                <div class="card-body">
+                    @if (Model.BetResults.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Bet #</th>
+                                        <th>Bet Amount</th>
+                                        <th>Bet Color</th>
+                                        <th>Number</th>
+                                        <th>Result Color</th>
+                                        <th>Result</th>
+                                        <th>Winnings</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var bet in Model.BetResults.Take(10))
+                                    {
+                                        <tr>
+                                            <td>#@bet.Id</td>
+                                            <td>$@bet.BetAmount.ToString("F2")</td>
+                                            <td>
+                                                <span class="badge @(bet.BetColor == BetColor.Red ? "bg-danger" : "bg-dark")">
+                                                    @bet.BetColor
+                                                </span>
+                                            </td>
+                                            <td><strong>@bet.RandomNumber</strong></td>
+                                            <td>
+                                                <span class="badge @(bet.ResultColor == BetColor.Red ? "bg-danger" : "bg-dark")">
+                                                    @bet.ResultColor
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (bet.Won)
+                                                {
+                                                    <span class="badge bg-success">Won</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Lost</span>
+                                                }
+                                            </td>
+                                            <td class="@(bet.Won ? "text-success" : "text-danger")">
+                                                @if (bet.Won)
+                                                {
+                                                    <span>+$@bet.Winnings.ToString("F2")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>-$@bet.BetAmount.ToString("F2")</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (Model.BetResults.Count > 10)
+                        {
+                            <p class="text-muted mt-2">Showing last 10 bets. Total: @Model.BetResults.Count</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No bets found.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

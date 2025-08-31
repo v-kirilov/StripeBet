@@ -1,0 +1,60 @@
+﻿@model BetResultViewModel
+@{
+    ViewData["Title"] = "Bet Result";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header @(Model.Won ? "bg-success" : "bg-danger") text-white">
+                    <h4 class="mb-0">🎰 Bet Result</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <h2 class="display-1">@Model.RandomNumber</h2>
+                        <h3 class="@(Model.ResultColor == Model.BetColor ? "text-dark" : "text-danger")">
+                            @(Model.ResultColor == BetColor.Black ? "🖤" : "❤️") @Model.ResultColor
+                        </h3>
+                    </div>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-6">
+                            <strong>Your Bet:</strong><br>
+                            $@Model.BetAmount.ToString("F2") on 
+                            @(Model.BetColor == BetColor.Black ? "🖤" : "❤️") @Model.BetColor
+                        </div>
+                        <div class="col-6">
+                            <strong>Result:</strong><br>
+                            @(Model.ResultColor == BetColor.Black ? "🖤" : "❤️") @Model.ResultColor
+                        </div>
+                    </div>
+
+                    @if (Model.Won)
+                    {
+                        <div class="alert alert-success">
+                            <h4>🎉 Congratulations! You Won!</h4>
+                            <p class="mb-0">You won $@Model.Winnings.ToString("F2")</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h4>😔 Sorry, You Lost!</h4>
+                            <p class="mb-0">Better luck next time!</p>
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+                        <strong>New Balance:</strong> $@Model.NewBalance.ToString("F2")
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Index" class="btn btn-primary">🎲 Bet Again</a>
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

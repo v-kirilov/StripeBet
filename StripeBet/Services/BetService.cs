@@ -29,8 +29,7 @@ namespace StripeBet.Services
             {
                 if (won)
                 {
-                    var winnings = betAmount;
-                    user.Balance += winnings;
+                    user.Balance += betAmount;
                 }
                 else
                 {

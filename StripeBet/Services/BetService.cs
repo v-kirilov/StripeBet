@@ -50,7 +50,7 @@ namespace StripeBet.Services
 
         public async Task UpdateUserBets(string userEmail, BetResultViewModel betResult)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+            var user = _userService.GetUserByEmail(userEmail);
             if (user != null)
             {
                 user.BetResults.Add(betResult);

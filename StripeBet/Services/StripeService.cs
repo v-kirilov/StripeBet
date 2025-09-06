@@ -14,7 +14,6 @@ namespace StripeBet.Services
     public class StripeService : IStripeService
     {
         private readonly PaymentIntentService _paymentIntentService;
-        private readonly CustomerService _customerService;
         private readonly PayoutService _payoutService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<StripeService> _logger;
@@ -22,7 +21,6 @@ namespace StripeBet.Services
         public StripeService(ApplicationDbContext context, ILogger<StripeService> logger)
         {
             _paymentIntentService = new PaymentIntentService();
-            _customerService = new CustomerService();
             _payoutService = new PayoutService();
             _logger = logger;
             _context = context;

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseUrls("https://localhost:7212");
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
